@@ -58,7 +58,7 @@ public class RisClient extends WebSocketClient {
 		this.prefix = Optional.of(prefix);
 	}
 
-	public void setHost(Optional<String> host) {
-		this.host = host;
+	public void setHost(String host) {
+		this.host = Optional.of(host);
 	}
 }
