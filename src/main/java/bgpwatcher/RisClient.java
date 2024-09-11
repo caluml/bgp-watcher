@@ -2,9 +2,10 @@ package bgpwatcher;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.time.Instant;
 import java.util.Optional;
 
 /**
@@ -13,6 +14,9 @@ import java.util.Optional;
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class RisClient extends WebSocketClient {
+
+	private final Logger updateLogger = LoggerFactory.getLogger("updates");
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Optional<String> prefix = Optional.empty();
 	private Optional<String> host = Optional.empty();
@@ -34,7 +38,8 @@ public class RisClient extends WebSocketClient {
 	@Override
 	public void onMessage(String message) {
 		if (!message.equals("{\"type\":\"pong\",\"data\":null}")) {
-			System.out.println(Instant.now() + ": " + message + "\n");
+			logger.info("{}\n", message);
+			updateLogger.info(message);
 		}
 	}
 
@@ -43,14 +48,12 @@ public class RisClient extends WebSocketClient {
 											String reason,
 											boolean remote) {
 		// The close codes are documented in class org.java_websocket.framing.CloseFrame
-		System.err.println(
-			"Connection closed by " + (remote ? "remote peer" : "us") + " Code: " + code + " Reason: "
-			+ reason);
+		logger.error("Connection closed by {} Code: {} Reason: {}", remote ? "remote peer" : "us", code, reason);
 	}
 
 	@Override
 	public void onError(Exception e) {
-		e.printStackTrace(System.err);
+		logger.error("Error", e);
 		// if the error is fatal then onClose will be called additionally
 	}
 
